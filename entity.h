@@ -23,6 +23,7 @@ class entity
 		void setPos(sf::Vector2i newPos);
 		sf::Vector2i getPos();
 		void move(sf::Vector2i delta);
+		int id() { return m_id;}
 };
 
 

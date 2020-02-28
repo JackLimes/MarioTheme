@@ -1,6 +1,7 @@
 #include "game.h"
 #include <chrono>
 #include <thread>
+#include <unistd.h>
 
 typedef std::chrono::duration<int, std::ratio<1, 60>> frame_duration;
 
@@ -22,7 +23,7 @@ game::game()
 	sf::Vector2i(16, 16), // texture offset
 	sf::Vector2i(0, 0), 0); // world coords
 
-	//loadLevel();
+	loadLevel();
 }
 
 void game::run()
@@ -43,18 +44,49 @@ void game::run()
 		
 		
 		m_rWin->clear();
+		drawBlocks();
 		m_mario.draw(m_rWin, m_camera);
-		m_mario.move(sf::Vector2i(10, 10));
+		m_mario.move(sf::Vector2i(16, 16));
 		m_rWin->display();
 
 		std::this_thread::sleep_until(startTick + frame_duration(1));
 	}
 }
 
-#include <iostream>
 game::~game()
 {
 	m_rWin->close();
 	delete m_rWin;
 	m_rWin = nullptr;
+}
+
+void game::loadLevel()
+{
+	//Hardcoded level
+	// TODO accept a string that points to a csv formatted... thing
+	m_level = map(15);
+	for(int r = 0; r < 15; r++)
+	{
+		m_level[r] = std::vector<entity>(16);
+	}
+	for(int c = 0; c < 16; c++)
+	{
+		entity e;
+		e.initSprite(&m_spriteSheet, sf::Vector2i(0, 0), sf::Vector2i(16*c, 16*14), 1);
+		m_level[14][c] = e;
+	}
+}
+
+void game::drawBlocks()
+{
+	for(int r = 0; r < m_level.size(); r++)
+	{
+		for(int c = 0; c < m_level[0].size(); c++)
+		{
+			if(m_level[r][c].id())
+			{
+				m_level[r][c].draw(m_rWin, m_camera);
+			}
+		}
+	}
 }
